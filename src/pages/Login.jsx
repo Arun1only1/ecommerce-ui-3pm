@@ -1,14 +1,14 @@
 import { Box, Typography } from "@mui/material";
 import React from "react";
-import RegisterForm from "../component/RegisterForm";
+import LoginForm from "../component/LoginForm";
 import { Link } from "react-router-dom";
 
-const Register = () => {
+const Login = () => {
   return (
     <Box
       sx={{
         width: "500px",
-        minHeight: "500px",
+
         borderRadius: "10px",
         margin: "auto",
         boxShadow:
@@ -19,16 +19,16 @@ const Register = () => {
         justifyContent: "center",
         alignItems: "center",
         gap: "2rem",
-        marginTop: "5rem",
+        marginTop: "20vh",
       }}
     >
       <Typography variant="h3" sx={{ color: "grey", marginBottom: "2rem" }}>
-        Register
+        Login
       </Typography>
-      <RegisterForm />
-      <Link to="/login">Already registered? Login</Link>
+      <LoginForm />
+      <Link to="/register">New here? Register</Link>
     </Box>
   );
 };
 
-export default Register;
+export default Login;
