@@ -1,35 +1,29 @@
-import React, { useState } from "react";
+import { Button, TextField } from "@mui/material";
 import { Formik } from "formik";
-import * as Yup from "yup";
-import {
-  Button,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextField,
-  Typography,
-} from "@mui/material";
-import axios from "axios";
+import React from "react";
+import { useMutation } from "react-query";
 import { useNavigate } from "react-router-dom";
+import * as Yup from "yup";
+import { $axios } from "../lib/axios";
 
 const LoginForm = () => {
   const navigate = useNavigate();
-  const loginUser = async (values) => {
-    try {
-      const res = await axios.post("http://localhost:8000/user/login", values);
 
-      const token = res?.data?.token;
-      const firstName = res?.data?.user?.firstName;
+  const loginMutation = useMutation({
+    mutationKey: ["login"],
+    mutationFn: async (values) => await $axios.post("/user/login", values),
+    onSuccess: (res) => {
+      console.log(res);
+      localStorage.setItem("accesstoken", res?.data?.token);
+      localStorage.setItem("firstName", res?.data?.user?.firstName);
+      localStorage.setItem("userRole", res?.data?.user?.role);
+      navigate("/product");
+    },
+    onError: (error) => {
+      console.log(error.response.data.message);
+    },
+  });
 
-      localStorage.setItem("accesstoken", token);
-      localStorage.setItem("firstName", firstName);
-
-      navigate("/home");
-    } catch (error) {
-      console.log(error.response.data);
-    }
-  };
   return (
     <>
       <Formik
@@ -46,7 +40,7 @@ const LoginForm = () => {
           password: Yup.string().required("Password is required"),
         })}
         onSubmit={async (values) => {
-          await loginUser(values);
+          loginMutation.mutate(values);
         }}
       >
         {(formik) => (
