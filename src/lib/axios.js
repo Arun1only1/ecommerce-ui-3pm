@@ -12,6 +12,7 @@ $axios.interceptors.request.use(function (config) {
   if (accesstoken) {
     config.headers.Authorization = `Bearer ${accesstoken}`;
   }
+
   return config;
 });
 

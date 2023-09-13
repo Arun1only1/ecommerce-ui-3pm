@@ -1,7 +1,5 @@
 import Home from "../pages/Home";
-import ProductList from "../pages/BuyerProductList";
-import BuyerProductList from "../pages/BuyerProductList";
-import SellerProductList from "../pages/SellerProductList";
+import Product from "../pages/Product";
 
 export const mainRoutes = [
   {
@@ -10,6 +8,6 @@ export const mainRoutes = [
   },
   {
     path: "/product",
-    element: <SellerProductList />,
+    element: <Product />,
   },
 ];

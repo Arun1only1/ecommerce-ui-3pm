@@ -1,6 +1,3 @@
-import React, { useState } from "react";
-import { Formik } from "formik";
-import * as Yup from "yup";
 import {
   Button,
   FormControl,
@@ -10,24 +7,34 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import axios from "axios";
+import { Formik } from "formik";
+import React from "react";
+import { useMutation } from "react-query";
+import { useNavigate } from "react-router-dom";
+import * as Yup from "yup";
+import { $axios } from "../lib/axios";
 
 const RegisterForm = () => {
-  const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
-  const registerUser = async (values) => {
-    const newUser = values;
-    delete newUser.confirmPassword;
-    const res = await axios.post(
-      "http://localhost:8000/user/register",
-      newUser
-    );
+  const { mutate, isLoading, isError, error } = useMutation({
+    mutationKey: ["register-user"],
+    mutationFn: (values) => {
+      return $axios.post("/user/register", values);
+    },
+    onSuccess: (res) => {
+      navigate("/login");
+    },
+  });
 
-    setMessage(res.data.message);
-  };
   return (
     <>
-      {message && <Typography variant="h4">{message}</Typography>}
+      {isLoading && <Typography>Registering...</Typography>}
+      {isError && (
+        <Typography sx={{ color: "red" }}>
+          {error.response.data.message}
+        </Typography>
+      )}
       <Formik
         initialValues={{
           email: "",
@@ -73,8 +80,9 @@ const RegisterForm = () => {
             .required("Role is required")
             .oneOf(["buyer", "seller"]),
         })}
-        onSubmit={async (values) => {
-          await registerUser(values);
+        onSubmit={(values) => {
+          delete values.confirmPassword;
+          mutate(values);
         }}
       >
         {(formik) => (
