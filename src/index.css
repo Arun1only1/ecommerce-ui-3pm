@@ -9,3 +9,30 @@
 
   text-align: left;
 }
+
+nav {
+  background-color: red;
+}
+
+.navlink-active {
+  color: orange;
+  text-decoration: none;
+  font-size: 2rem;
+}
+
+.navlink-pending {
+  color: white;
+  font-size: 2rem;
+  text-decoration: none;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 60px; /* Height of the footer */
+  background: #352f44;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

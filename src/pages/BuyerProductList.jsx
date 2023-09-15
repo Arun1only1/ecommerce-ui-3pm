@@ -4,6 +4,8 @@ import { $axios } from "../lib/axios";
 import { Box, CircularProgress, Grid, Typography } from "@mui/material";
 import ProductCard from "../component/ProductCard";
 import Progress from "../component/Progress";
+import Header from "../component/Header";
+import Footer from "../component/Footer";
 
 const BuyerProductList = () => {
   const { data, error, isError, isLoading } = useQuery({
@@ -19,26 +21,28 @@ const BuyerProductList = () => {
   const products = data?.data;
   console.log(products);
   return (
-    <Grid
-      container
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        gap: "2rem",
-        flexWrap: "wrap",
-      }}
-    >
-      {isLoading && <Progress />}
-      {isError && (
-        <Typography sx={{ color: "red" }}>
-          {error.response.data.message}
-        </Typography>
-      )}
-      {products?.map((item) => {
-        return <ProductCard key={item._id} item={item} />;
-      })}
-    </Grid>
+    <>
+      <Grid
+        container
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: "2rem",
+          flexWrap: "wrap",
+        }}
+      >
+        {isLoading && <Progress />}
+        {isError && (
+          <Typography sx={{ color: "red" }}>
+            {error.response.data.message}
+          </Typography>
+        )}
+        {products?.map((item) => {
+          return <ProductCard key={item._id} item={item} />;
+        })}
+      </Grid>
+    </>
   );
 };
 
