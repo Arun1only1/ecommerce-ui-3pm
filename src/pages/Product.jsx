@@ -9,12 +9,27 @@ const Product = () => {
   const navigate = useNavigate();
 
   return (
-    <Box sx={{ mt: "5rem", padding: "4rem" }}>
+    <Box
+      sx={{
+        mt: {
+          xs: "1rem",
+          md: "3rem",
+        },
+        padding: {
+          xs: 0,
+          sm: "3rem",
+        },
+      }}
+    >
       <Stack
         sx={{
           display: "flex",
           flexDirection: "row",
-          justifyContent: "flex-end",
+          justifyContent: {
+            xs: "center",
+            sm: "center",
+            md: "flex-end",
+          },
           alignItems: "center",
           mb: "3rem",
           mr: "7rem",

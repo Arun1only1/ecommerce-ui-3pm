@@ -12,8 +12,11 @@ const ProductCard = (props) => {
   return (
     <Card
       sx={{
-        width: "30%",
-        maxHeight: "500px",
+        width: {
+          xs: "100%",
+          md: "30%",
+        },
+        minHeight: "500px",
         boxShadow:
           " rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px",
       }}
