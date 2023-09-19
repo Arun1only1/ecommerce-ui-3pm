@@ -1,6 +1,6 @@
 import MainLayout from "../layout/MainLayout";
 import About from "../pages/About";
-import AddProduct from "../pages/AddProduct";
+import AddProductForm from "../pages/AddProductForm";
 import Home from "../pages/Home";
 import Product from "../pages/Product";
 
@@ -23,7 +23,11 @@ export const mainRoutes = [
       },
       {
         path: "product/add",
-        element: <AddProduct />,
+        element: <AddProductForm />,
+      },
+      {
+        path: "product/edit/:id",
+        element: <p>Hello</p>,
       },
     ],
   },

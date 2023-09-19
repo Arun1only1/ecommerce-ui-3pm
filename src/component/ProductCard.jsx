@@ -5,7 +5,7 @@ import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import { Grid } from "@mui/material";
+import { Chip, Grid, Stack } from "@mui/material";
 
 const ProductCard = (props) => {
   const product = props.item;
@@ -14,8 +14,9 @@ const ProductCard = (props) => {
       sx={{
         width: {
           xs: "100%",
-          md: "30%",
+          sm: "30vw",
         },
+
         minHeight: "500px",
         boxShadow:
           " rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px",
@@ -28,9 +29,14 @@ const ProductCard = (props) => {
         image="https://assets.vogue.com/photos/61e9a9960f2c70681323293d/master/w_2560%2Cc_limit/Paris%2520Mens%2520Fall%252022%2520day%25203%2520by%2520STYLEDUMONDE0K3A6025FullRes.jpg"
       />
       <CardContent>
-        <Typography gutterBottom variant="h5" component="div">
-          {product?.name}
-        </Typography>
+        <Stack direction="row" gap={10}>
+          <Typography gutterBottom variant="h5" component="div">
+            {product?.name}
+          </Typography>
+          <Chip label={product?.company} color="success" variant="outlined" />
+        </Stack>
+        <Typography variant="h6">Rs.{product.price}</Typography>
+
         <Typography variant="body2" color="text.secondary">
           {product?.description?.slice(0, 300)}...
         </Typography>

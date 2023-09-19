@@ -8,7 +8,9 @@ const MainLayout = () => {
   return (
     <>
       <Header />
-      <Outlet />
+      <Box sx={{ minHeight: "70vh" }}>
+        <Outlet />
+      </Box>
       <Footer />
     </>
   );
