@@ -7,8 +7,11 @@ const Register = () => {
   return (
     <Box
       sx={{
-        width: "500px",
-        minHeight: "500px",
+        width: {
+          xs: "100%",
+          sm: "30%",
+        },
+
         borderRadius: "10px",
         margin: "auto",
         boxShadow:

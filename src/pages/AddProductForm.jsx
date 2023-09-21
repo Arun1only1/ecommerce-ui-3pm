@@ -43,7 +43,14 @@ const AddProductForm = () => {
   });
 
   return (
-    <Box sx={{ display: "grid", placeItems: "center" }}>
+    <Box
+      sx={{
+        display: "grid",
+        placeItems: "center",
+        width: "100%",
+        // backgroundColor: "grey",
+      }}
+    >
       <Formik
         initialValues={{
           name: "",
@@ -92,28 +99,16 @@ const AddProductForm = () => {
           <form
             onSubmit={formik.handleSubmit}
             style={{
-              marginTop: "10rem",
-
+              marginTop: "7rem",
               boxShadow:
                 " rgba(67, 71, 85, 0.27) 0px 0px 0.25em, rgba(90, 125, 188, 0.05) 0px 0.25em 1em",
               display: "flex",
               flexDirection: "column",
               justifyContent: "center",
               alignItems: "center",
-              gap: "2rem",
+              gap: "1rem",
               padding: "1rem",
-              // padding: {
-              //   xs: "1rem",
-              //   sm: "2rem",
-              // },
-
-              width: "30vw",
-
-              // width: {
-              //   xs: "100%",
-              //   sm: "60vw",
-              //   lg: "40vw",
-              // },
+              minWidth: "30%",
             }}
           >
             <Typography variant="h6" sx={{ color: "black" }}>

@@ -16,6 +16,8 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { Avatar } from "@mui/material";
 import { Link, NavLink } from "react-router-dom";
+import { BiLogOut } from "react-icons/bi";
+import LogoutDialog from "./LogoutDialog";
 
 const drawerWidth = 240;
 const navItems = [
@@ -67,7 +69,15 @@ function Header(props) {
     window !== undefined ? () => window().document.body : undefined;
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box
+      sx={{
+        display: "flex",
+        mb: {
+          xs: "7rem",
+          sm: "3rem",
+        },
+      }}
+    >
       <CssBaseline />
       <AppBar
         component="nav"
@@ -75,9 +85,6 @@ function Header(props) {
           background: "#5C5470",
           minHeight: "4rem",
           display: "flex",
-          //   flexDirection: "row",
-          //   justifyContent: "space-between",
-          //   alignItems: "center",
         }}
       >
         <Toolbar>
@@ -128,6 +135,7 @@ function Header(props) {
           <Avatar sx={{ width: 45, height: 45, backgroundColor: "purple" }}>
             OP
           </Avatar>
+          <LogoutDialog />
         </Toolbar>
       </AppBar>
       <nav>

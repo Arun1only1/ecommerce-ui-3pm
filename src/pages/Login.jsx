@@ -7,7 +7,7 @@ const Login = () => {
   return (
     <Box
       sx={{
-        width: "500px",
+        width: "25vw",
 
         borderRadius: "10px",
         margin: "auto",

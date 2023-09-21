@@ -3,6 +3,7 @@ import About from "../pages/About";
 import AddProductForm from "../pages/AddProductForm";
 import Home from "../pages/Home";
 import Product from "../pages/Product";
+import ProductDetail from "../pages/ProductDetail";
 
 export const mainRoutes = [
   {
@@ -28,6 +29,10 @@ export const mainRoutes = [
       {
         path: "product/edit/:id",
         element: <p>Hello</p>,
+      },
+      {
+        path: "product/detail/:productId",
+        element: <ProductDetail />,
       },
     ],
   },

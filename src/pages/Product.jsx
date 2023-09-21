@@ -1,8 +1,8 @@
-import React from "react";
-import SellerProductList from "./SellerProductList";
-import BuyerProductList from "./BuyerProductList";
 import { Box, Button, Stack } from "@mui/material";
+import React from "react";
 import { useNavigate } from "react-router-dom";
+import BuyerProductList from "./BuyerProductList";
+import SellerProductList from "./SellerProductList";
 
 const Product = () => {
   const userRole = localStorage.getItem("userRole");
@@ -11,10 +11,6 @@ const Product = () => {
   return (
     <Box
       sx={{
-        mt: {
-          xs: "1rem",
-          md: "3rem",
-        },
         padding: {
           xs: 0,
           sm: "3rem",
@@ -31,13 +27,27 @@ const Product = () => {
             md: "flex-end",
           },
           alignItems: "center",
-          mb: "3rem",
-          mr: "7rem",
+
+          mr: {
+            xs: 0,
+            sm: "5rem",
+          },
         }}
       >
-        <Button variant="contained" onClick={() => navigate("/product/add")}>
-          Add product
-        </Button>
+        {userRole === "seller" && (
+          <Button
+            variant="contained"
+            onClick={() => navigate("/product/add")}
+            sx={{
+              width: {
+                xs: "100vw",
+                sm: "auto",
+              },
+            }}
+          >
+            Add product
+          </Button>
+        )}
       </Stack>
 
       {userRole === "seller" ? <SellerProductList /> : <BuyerProductList />}

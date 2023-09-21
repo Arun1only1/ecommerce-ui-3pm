@@ -1,25 +1,27 @@
-import React from "react";
+import { Grid, Pagination, Typography } from "@mui/material";
+import React, { useState } from "react";
 import { useQuery } from "react-query";
-import { $axios } from "../lib/axios";
-import { Box, CircularProgress, Grid, Typography } from "@mui/material";
 import ProductCard from "../component/ProductCard";
 import Progress from "../component/Progress";
-import Header from "../component/Header";
-import Footer from "../component/Footer";
+import { $axios } from "../lib/axios";
 
 const BuyerProductList = () => {
+  const [page, setPage] = useState(1);
+
   const { data, error, isError, isLoading } = useQuery({
-    queryKey: ["buyer-product-list"],
+    queryKey: ["buyer-product-list", page],
     queryFn: async () => {
       return await $axios.post("/product/buyer/all", {
-        page: 1,
-        limit: 10,
+        page,
+        limit: 9,
       });
     },
   });
 
-  const products = data?.data;
-  console.log(products);
+  const products = data?.data?.products;
+
+  const totalPage = data?.data?.totalPage;
+
   return (
     <>
       <Grid
@@ -30,6 +32,7 @@ const BuyerProductList = () => {
           alignItems: "center",
           gap: "2rem",
           flexWrap: "wrap",
+          minHeight: "60vh",
         }}
       >
         {isLoading && <Progress />}
@@ -42,6 +45,19 @@ const BuyerProductList = () => {
           return <ProductCard key={item._id} item={item} />;
         })}
       </Grid>
+      <Pagination
+        count={totalPage}
+        color="secondary"
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          background: "none",
+          mt: "2rem",
+        }}
+        onChange={(_, value) => {
+          setPage(value);
+        }}
+      />
     </>
   );
 };
