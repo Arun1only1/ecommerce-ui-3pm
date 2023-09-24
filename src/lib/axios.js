@@ -1,7 +1,9 @@
 import axios from "axios";
 
+const localhostUrl = "http://localhost:8000";
+const hostedUrl = "https://gray-determined-crow.cyclic.cloud";
 const $axios = axios.create({
-  baseURL: "http://localhost:8000", // to not repeat everytime
+  baseURL: localhostUrl, // to not repeat everytime
   timeout: 5000,
 });
 

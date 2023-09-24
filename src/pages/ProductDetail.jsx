@@ -3,15 +3,17 @@ import React, { useState } from "react";
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 import { useQuery } from "react-query";
 import { $axios } from "../lib/axios";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Progress from "../component/Progress";
+
 const ProductDetail = () => {
   const [count, setCount] = useState(1);
 
   const userRole = localStorage.getItem("userRole");
 
   const params = useParams();
-  console.log(params);
+
+  const navigate = useNavigate();
 
   const { data, isError, error, isLoading } = useQuery({
     queryKey: ["product-detail"],
@@ -147,7 +149,11 @@ const ProductDetail = () => {
             </Grid>
           </>
         ) : (
-          <Button variant="contained" sx={{ width: "200px" }}>
+          <Button
+            variant="contained"
+            sx={{ width: "200px" }}
+            onClick={() => navigate(`/product/edit/${productDetails?._id}`)}
+          >
             Edit Product
           </Button>
         )}
