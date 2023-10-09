@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "react-query";
 import { $axios } from "../lib/axios";
 import Progress from "./Progress";
+import { placeHolderImage } from "../constants/fallback.image";
 
 const ProductCard = (props) => {
   // popover
@@ -93,20 +94,21 @@ const ProductCard = (props) => {
         sx={{
           maxWidth: {
             xs: "100vw",
-            sm: "25vw",
+            sm: "40vw",
+            md: "30vw",
           },
-
-          maxHeight: 500,
+          borderRadius: "8px",
+          maxHeight: 600,
           boxShadow:
             " rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px",
         }}
       >
         <CardMedia
           onClick={() => goToProductDetail()}
-          sx={{ objectFit: "cover", height: "200px", cursor: "pointer" }}
+          sx={{ objectFit: "cover", height: "300px", cursor: "pointer" }}
           component="img"
           alt={product?.name}
-          image="https://assets.vogue.com/photos/61e9a9960f2c70681323293d/master/w_2560%2Cc_limit/Paris%2520Mens%2520Fall%252022%2520day%25203%2520by%2520STYLEDUMONDE0K3A6025FullRes.jpg"
+          image={product?.image || placeHolderImage}
         />
         <CardContent>
           <Stack direction="row" gap={10}>
@@ -117,29 +119,29 @@ const ProductCard = (props) => {
           </Stack>
           <Typography variant="h6">Rs.{product.price}</Typography>
 
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" color="text.secondary" mb="1rem">
             {product?.description?.slice(0, 200)}...
           </Typography>
-        </CardContent>
-        <CardActions>
-          <Button
-            size="small"
-            variant="contained"
-            onClick={() => goToProductDetail()}
-          >
-            Explore
-          </Button>
-          {userRole === "seller" && (
+          <Stack direction="row" spacing={2}>
             <Button
               size="small"
               variant="contained"
-              color="error"
-              onClick={(event) => openPopover(event)}
+              onClick={() => goToProductDetail()}
             >
-              Delete
+              Explore
             </Button>
-          )}
-        </CardActions>
+            {userRole === "seller" && (
+              <Button
+                size="small"
+                variant="contained"
+                color="error"
+                onClick={(event) => openPopover(event)}
+              >
+                Delete
+              </Button>
+            )}
+          </Stack>
+        </CardContent>
       </Card>
     </>
   );

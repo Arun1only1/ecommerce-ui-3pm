@@ -1,33 +1,52 @@
-import { Button, TextField, Typography } from "@mui/material";
+import {
+  Button,
+  FormControl,
+  IconButton,
+  InputAdornment,
+  InputLabel,
+  OutlinedInput,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { Formik } from "formik";
 import React from "react";
 import { useMutation } from "react-query";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import { $axios } from "../lib/axios";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { useDispatch } from "react-redux";
+import { openErrorSnackbar } from "../store/slice/snackbarSlice";
 
 const LoginForm = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [showPassword, setShowPassword] = React.useState(false);
 
-  const { mutate, isLoading, error, isError } = useMutation({
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+  };
+
+  const { mutate, isLoading } = useMutation({
     mutationKey: ["login"],
     mutationFn: async (values) => await $axios.post("/user/login", values),
     onSuccess: (res) => {
       localStorage.setItem("accesstoken", res?.data?.token);
       localStorage.setItem("firstName", res?.data?.user?.firstName);
       localStorage.setItem("userRole", res?.data?.user?.role);
+      localStorage.setItem("lastName", res?.data?.user?.lastName);
       navigate("/product");
+    },
+    onError: (error) => {
+      console.log(error.response);
+      dispatch(openErrorSnackbar(error?.response?.data?.message));
     },
   });
 
   return (
     <>
-      {isLoading && <Typography>Logging in...</Typography>}
-      {isError && (
-        <Typography sx={{ color: "red" }}>
-          {error.response.data.message}
-        </Typography>
-      )}
       <Formik
         initialValues={{
           email: "",
@@ -60,12 +79,39 @@ const LoginForm = () => {
               <div className="error-message">{formik.errors.email}</div>
             ) : null}
 
-            <TextField label="Password" {...formik.getFieldProps("password")} />
-            {formik.touched.password && formik.errors.password ? (
-              <div className="error-message">{formik.errors.password}</div>
-            ) : null}
+            <FormControl variant="outlined" fullWidth>
+              <InputLabel htmlFor="outlined-adornment-password">
+                Password
+              </InputLabel>
+              <OutlinedInput
+                id="outlined-adornment-password"
+                {...formik.getFieldProps("password")}
+                type={showPassword ? "text" : "password"}
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={handleClickShowPassword}
+                      onMouseDown={handleMouseDownPassword}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                }
+                label="Password"
+              />
+              {formik.touched.password && formik.errors.password ? (
+                <div className="error-message">{formik.errors.password}</div>
+              ) : null}
+            </FormControl>
 
-            <Button type="submit" variant="contained" color="success">
+            <Button
+              type="submit"
+              variant="contained"
+              color="success"
+              disabled={isLoading}
+            >
               Sign in
             </Button>
           </form>

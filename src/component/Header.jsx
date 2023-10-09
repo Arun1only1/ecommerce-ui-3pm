@@ -14,12 +14,18 @@ import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import { Avatar } from "@mui/material";
-import { Link, NavLink } from "react-router-dom";
+import { Avatar, Badge, Stack } from "@mui/material";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { BiLogOut } from "react-icons/bi";
 import LogoutDialog from "./LogoutDialog";
+import { AiOutlineShoppingCart } from "react-icons/ai";
+import { useQuery } from "react-query";
+import { $axios } from "../lib/axios";
+import { getUserShortName } from "../utils/user.short.name";
+import { isSeller } from "../utils/user.role";
 
 const drawerWidth = 240;
+
 const navItems = [
   {
     id: 1,
@@ -42,10 +48,26 @@ function Header(props) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
+  const { pathname } = useLocation();
+
+  const navigate = useNavigate();
+
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState);
   };
 
+  const userIsSeller = isSeller();
+
+  // get cart count query
+  const { data } = useQuery({
+    queryKey: ["cart-count"],
+    queryFn: async () => {
+      return await $axios.get("/cart/count");
+    },
+    enabled: !userIsSeller, // controls query hit as per condition
+  });
+
+  const cartItemCount = data?.data?.count;
   const drawer = (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
       <Typography variant="h6" sx={{ my: 2 }}>
@@ -84,7 +106,7 @@ function Header(props) {
         sx={{
           background: "#5C5470",
           minHeight: "4rem",
-          display: "flex",
+          // display: "flex",
         }}
       >
         <Toolbar>
@@ -132,10 +154,30 @@ function Header(props) {
               </Button>
             ))}
           </Box>
-          <Avatar sx={{ width: 45, height: 45, backgroundColor: "purple" }}>
-            OP
-          </Avatar>
-          <LogoutDialog />
+          <Stack
+            direction="row"
+            justifyContent="center"
+            alignItems="center"
+            spacing={3}
+          >
+            {!isSeller() && (
+              <Badge badgeContent={cartItemCount} color="success">
+                <AiOutlineShoppingCart
+                  size={30}
+                  style={{
+                    cursor: "pointer",
+                    color: pathname === "/cart" ? "orange" : null,
+                  }}
+                  onClick={() => navigate("/cart")}
+                />
+              </Badge>
+            )}
+
+            <Avatar sx={{ width: 45, height: 45, backgroundColor: "purple" }}>
+              {getUserShortName()}
+            </Avatar>
+            <LogoutDialog />
+          </Stack>
         </Toolbar>
       </AppBar>
       <nav>

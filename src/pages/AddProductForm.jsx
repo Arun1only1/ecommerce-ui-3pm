@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import {
@@ -19,20 +19,22 @@ import {
 import { Form, useNavigate } from "react-router-dom";
 import { useMutation } from "react-query";
 import { $axios } from "../lib/axios";
+import axios from "axios";
+import { useDispatch } from "react-redux";
+import { openErrorSnackbar } from "../store/slice/snackbarSlice";
+import Progress from "../component/Progress";
+import { productCategories } from "../constants/general.constant";
 
-const productCategories = [
-  "grocery",
-  "kitchen",
-  "clothing",
-  "electronics",
-  "furniture",
-  "bakery",
-  "liquor",
-  "sports",
-];
 const AddProductForm = () => {
+  const [productImage, setProductImage] = useState(null);
+  const [localUrl, setLocalUrl] = useState(null);
+  const [imageLoading, setImageLoading] = useState(false);
+
+  const dispatch = useDispatch();
+
   const navigate = useNavigate();
-  const { mutate, isLoading, isError, error } = useMutation({
+
+  const { mutate, isLoading } = useMutation({
     mutationKey: ["add-product"],
     mutationFn: async (values) => {
       return await $axios.post("/product/add", values);
@@ -40,7 +42,14 @@ const AddProductForm = () => {
     onSuccess: (res) => {
       navigate("/product");
     },
+    onError: (error) => {
+      dispatch(openErrorSnackbar(error?.response?.data?.message));
+    },
   });
+
+  if (isLoading || imageLoading) {
+    return <Progress />;
+  }
 
   return (
     <Box
@@ -48,7 +57,6 @@ const AddProductForm = () => {
         display: "grid",
         placeItems: "center",
         width: "100%",
-        // backgroundColor: "grey",
       }}
     >
       <Formik
@@ -89,146 +97,205 @@ const AddProductForm = () => {
             .required("Quantity is required.")
             .integer("Quantity must be an integer."),
         })}
-        onSubmit={(values) => {
+        onSubmit={async (values) => {
           values.price = Number(values.price);
-          console.log(values);
+
+          let imageUrl = "";
+
+          if (productImage) {
+            const cloudName = "dlkcko4n6";
+
+            // creates form data object
+            const data = new FormData();
+            data.append("file", productImage);
+            data.append("upload_preset", "nepal-mart");
+            data.append("cloud_name", cloudName);
+
+            // hit cloudinary api
+
+            try {
+              setImageLoading(true);
+              const res = await axios.post(
+                `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+                data
+              );
+              imageUrl = res?.data?.secure_url;
+              setImageLoading(false);
+            } catch (error) {
+              dispatch(openErrorSnackbar(error?.response?.data?.message));
+              setImageLoading(false);
+            }
+          }
+
+          if (imageUrl) {
+            values.image = imageUrl;
+          }
+
           mutate(values);
         }}
       >
         {(formik) => (
-          <form
-            onSubmit={formik.handleSubmit}
-            style={{
+          <Box
+            sx={{
               marginTop: "7rem",
-              boxShadow:
-                " rgba(67, 71, 85, 0.27) 0px 0px 0.25em, rgba(90, 125, 188, 0.05) 0px 0.25em 1em",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: "1rem",
-              padding: "1rem",
-              minWidth: "30%",
+              width: {
+                xs: "90%",
+                sm: "60%",
+                md: "40%",
+                lg: "30%",
+              },
             }}
           >
-            <Typography variant="h6" sx={{ color: "black" }}>
-              Add Product
-            </Typography>
-
-            <FormControl fullWidth>
-              <TextField
-                variant="filled"
-                label="Name"
-                {...formik.getFieldProps("name")}
-                fullWidth
-              />
-              {formik.touched.name && formik.errors.name ? (
-                <div className="error-message">{formik.errors.name}</div>
-              ) : null}
-            </FormControl>
-
-            <FormControl fullWidth>
-              <TextField
-                variant="filled"
-                label="Company"
-                {...formik.getFieldProps("company")}
-                fullWidth
-              />
-              {formik.touched.company && formik.errors.company ? (
-                <div className="error-message">{formik.errors.company}</div>
-              ) : null}
-            </FormControl>
-            <FormControl fullWidth sx={{ m: 1 }} variant="filled">
-              <InputLabel htmlFor="filled-adornment-amount">Amount</InputLabel>
-              <FilledInput
-                {...formik.getFieldProps("price")}
-                startAdornment={
-                  <InputAdornment position="start">Rs.</InputAdornment>
-                }
-              />
-
-              {formik.touched.price && formik.errors.price ? (
-                <div className="error-message">{formik.errors.price}</div>
-              ) : null}
-            </FormControl>
-
-            <FormControl fullWidth sx={{ m: 1 }} variant="filled">
-              <TextField
-                type="number"
-                {...formik.getFieldProps("quantity")}
-                label="Quantity"
-                fullWidth
-                variant="filled"
-              />
-              {formik.touched.quantity && formik.errors.quantity ? (
-                <div className="error-message">{formik.errors.quantity}</div>
-              ) : null}
-            </FormControl>
-            <FormControl fullWidth>
-              <InputLabel id="demo-simple-select-label">Category</InputLabel>
-              <Select
-                variant="filled"
-                {...formik.getFieldProps("category")}
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
-              >
-                {productCategories.map((item, index) => {
-                  return (
-                    <MenuItem key={index} value={item}>
-                      {item}
-                    </MenuItem>
-                  );
-                })}
-              </Select>
-            </FormControl>
-
-            <FormControl
-              fullWidth
-              sx={{
+            <form
+              onSubmit={formik.handleSubmit}
+              style={{
+                boxShadow:
+                  " rgba(67, 71, 85, 0.27) 0px 0px 0.25em, rgba(90, 125, 188, 0.05) 0px 0.25em 1em",
                 display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-around",
-                // backgroundColor: "red",
+                flexDirection: "column",
+                justifyContent: "center",
                 alignItems: "center",
+                gap: "1rem",
+                padding: "1rem",
               }}
             >
               <Typography variant="h6" sx={{ color: "black" }}>
-                Free shipping
+                Add Product
               </Typography>
 
-              {/* we can set formik values using formik.values and formik.setFieldValue */}
-              <Checkbox
-                color="success"
-                sx={{ "& .MuiSvgIcon-root": { fontSize: 35 } }}
-                // {...formik.getFieldProps("freeShipping")}
-                checked={formik.values.freeShipping}
-                onChange={() => {
-                  formik.setFieldValue(
-                    "freeShipping",
-                    !formik.values.freeShipping
-                  );
+              {productImage && (
+                <img
+                  src={localUrl}
+                  style={{ width: "100%", height: "auto", objectFit: "cover" }}
+                />
+              )}
+              <input
+                type="file"
+                onChange={(event) => {
+                  const productPhoto = event.target.files[0];
+                  setProductImage(productPhoto);
+                  setLocalUrl(URL.createObjectURL(productPhoto));
                 }}
               />
-            </FormControl>
+              <FormControl fullWidth>
+                <TextField
+                  variant="filled"
+                  label="Name"
+                  {...formik.getFieldProps("name")}
+                  fullWidth
+                />
+                {formik.touched.name && formik.errors.name ? (
+                  <div className="error-message">{formik.errors.name}</div>
+                ) : null}
+              </FormControl>
 
-            <FormControl fullWidth>
-              <TextareaAutosize
-                className="product-description"
-                placeholder="Product description here..."
-                {...formik.getFieldProps("description")}
-              />
+              <FormControl fullWidth>
+                <TextField
+                  variant="filled"
+                  label="Company"
+                  {...formik.getFieldProps("company")}
+                  fullWidth
+                />
+                {formik.touched.company && formik.errors.company ? (
+                  <div className="error-message">{formik.errors.company}</div>
+                ) : null}
+              </FormControl>
+              <FormControl fullWidth sx={{ m: 1 }} variant="filled">
+                <InputLabel htmlFor="filled-adornment-amount">
+                  Amount
+                </InputLabel>
+                <FilledInput
+                  {...formik.getFieldProps("price")}
+                  startAdornment={
+                    <InputAdornment position="start">Rs.</InputAdornment>
+                  }
+                />
 
-              {formik.touched.description && formik.errors.description ? (
-                <div className="error-message">{formik.errors.description}</div>
-              ) : null}
-            </FormControl>
+                {formik.touched.price && formik.errors.price ? (
+                  <div className="error-message">{formik.errors.price}</div>
+                ) : null}
+              </FormControl>
 
-            {/* {console.log(formik.values)} */}
+              <FormControl fullWidth sx={{ m: 1 }} variant="filled">
+                <TextField
+                  type="number"
+                  {...formik.getFieldProps("quantity")}
+                  label="Quantity"
+                  fullWidth
+                  variant="filled"
+                />
+                {formik.touched.quantity && formik.errors.quantity ? (
+                  <div className="error-message">{formik.errors.quantity}</div>
+                ) : null}
+              </FormControl>
+              <FormControl fullWidth>
+                <InputLabel id="demo-simple-select-label">Category</InputLabel>
+                <Select
+                  variant="filled"
+                  {...formik.getFieldProps("category")}
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                >
+                  {productCategories.map((item, index) => {
+                    return (
+                      <MenuItem key={index} value={item}>
+                        {item}
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+              </FormControl>
 
-            <Button type="submit" variant="contained" fullWidth>
-              Add product
-            </Button>
-          </form>
+              <FormControl
+                fullWidth
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-around",
+                  // backgroundColor: "red",
+                  alignItems: "center",
+                }}
+              >
+                <Typography variant="h6" sx={{ color: "black" }}>
+                  Free shipping
+                </Typography>
+
+                {/* we can set formik values using formik.values and formik.setFieldValue */}
+                <Checkbox
+                  color="success"
+                  sx={{ "& .MuiSvgIcon-root": { fontSize: 35 } }}
+                  // {...formik.getFieldProps("freeShipping")}
+                  checked={formik.values.freeShipping}
+                  onChange={() => {
+                    formik.setFieldValue(
+                      "freeShipping",
+                      !formik.values.freeShipping
+                    );
+                  }}
+                />
+              </FormControl>
+
+              <FormControl fullWidth>
+                <TextareaAutosize
+                  className="product-description"
+                  placeholder="Product description here..."
+                  {...formik.getFieldProps("description")}
+                />
+
+                {formik.touched.description && formik.errors.description ? (
+                  <div className="error-message">
+                    {formik.errors.description}
+                  </div>
+                ) : null}
+              </FormControl>
+
+              {/* {console.log(formik.values)} */}
+
+              <Button type="submit" variant="contained" fullWidth>
+                Add product
+              </Button>
+            </form>
+          </Box>
         )}
       </Formik>
     </Box>

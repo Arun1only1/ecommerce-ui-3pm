@@ -5,23 +5,32 @@ import { Box, Pagination, Typography } from "@mui/material";
 import ProductCard from "../component/ProductCard";
 import Progress from "../component/Progress";
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { openErrorSnackbar } from "../store/slice/snackbarSlice";
 
 const SellerProductList = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["seller-product-list", currentPage],
+  const { searchText } = useSelector((state) => state.product);
+
+  const dispatch = useDispatch();
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["seller-product-list", currentPage, searchText],
     queryFn: async () => {
       return await $axios.post("/product/seller/all", {
         page: currentPage,
         limit: 9,
+        searchText: searchText || "",
       });
+    },
+    onError: (error) => {
+      dispatch(openErrorSnackbar(error?.response?.data?.message));
     },
   });
 
   const productList = data?.data?.products;
   const totalPage = data?.data?.totalPage;
-  console.log(totalPage);
 
   if (isLoading) {
     return <Progress />;

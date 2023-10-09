@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import {
@@ -20,20 +20,19 @@ import { Form, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery } from "react-query";
 import { $axios } from "../lib/axios";
 import Progress from "../component/Progress";
+import { placeHolderImage } from "../constants/fallback.image";
+import axios from "axios";
+import { openErrorSnackbar } from "../store/slice/snackbarSlice";
+import { useDispatch } from "react-redux";
+import { productCategories } from "../constants/general.constant";
 
-const productCategories = [
-  "grocery",
-  "kitchen",
-  "clothing",
-  "electronics",
-  "furniture",
-  "bakery",
-  "liquor",
-  "sports",
-];
 const EditProductForm = () => {
-  const params = useParams();
+  const [localUrl, setLocalUrl] = useState(null);
+  const [productImage, setProductImage] = useState(null);
+  const [uploadImageLoading, setUploadImageLoading] = useState(false);
 
+  const params = useParams();
+  const dispatch = useDispatch();
   const productId = params.id;
 
   const navigate = useNavigate();
@@ -62,7 +61,7 @@ const EditProductForm = () => {
     },
   });
 
-  if (isLoading || editProductLoading) {
+  if (isLoading || editProductLoading || uploadImageLoading) {
     return <Progress />;
   }
 
@@ -115,7 +114,36 @@ const EditProductForm = () => {
               .required("Quantity is required.")
               .integer("Quantity must be an integer."),
           })}
-          onSubmit={(values) => {
+          onSubmit={async (values) => {
+            let imageUrl = "";
+            if (productImage) {
+              const cloudName = "dlkcko4n6";
+
+              // creates form data object
+              const data = new FormData();
+              data.append("file", productImage);
+              data.append("upload_preset", "nepal-mart");
+              data.append("cloud_name", cloudName);
+
+              // hit cloudinary api
+              try {
+                setUploadImageLoading(true);
+                const res = await axios.post(
+                  `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+                  data
+                );
+                imageUrl = res?.data?.secure_url;
+                setUploadImageLoading(false);
+              } catch (error) {
+                dispatch(openErrorSnackbar(error?.response?.data?.message));
+                setUploadImageLoading(false);
+              }
+            }
+
+            if (imageUrl) {
+              values.image = imageUrl;
+            }
+
             mutate(values);
           }}
         >
@@ -152,6 +180,26 @@ const EditProductForm = () => {
                 <Typography variant="h6" sx={{ color: "black" }}>
                   Edit Product
                 </Typography>
+
+                <img
+                  src={localUrl || productDetails?.image || placeHolderImage}
+                  style={{ width: "100%", height: "auto", objectFit: "cover" }}
+                />
+
+                <Button variant="contained" component="label">
+                  Upload
+                  <input
+                    hidden
+                    accept="image/*"
+                    type="file"
+                    onChange={(event) => {
+                      const productPhoto = event.target.files[0];
+                      setLocalUrl(URL.createObjectURL(productPhoto));
+                      setProductImage(productPhoto);
+                      console.log(productPhoto);
+                    }}
+                  />
+                </Button>
 
                 <FormControl fullWidth>
                   <TextField
