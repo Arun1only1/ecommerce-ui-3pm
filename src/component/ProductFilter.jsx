@@ -41,8 +41,16 @@ const MenuProps = {
 };
 
 const ProductFilter = () => {
-  const { productFilterOpen, category } = useSelector((state) => state.product);
+  const { productFilterOpen, minPrice, maxPrice, filterApplied } = useSelector(
+    (state) => state.product
+  );
   const [categoryName, setCategoryName] = React.useState([]);
+
+  React.useEffect(() => {
+    if (!filterApplied) {
+      setCategoryName([]);
+    }
+  }, [filterApplied]);
 
   const handleChange = (event) => {
     const {
@@ -75,8 +83,8 @@ const ProductFilter = () => {
         <DialogContent>
           <Formik
             initialValues={{
-              minPrice: 0,
-              maxPrice: 0,
+              minPrice: minPrice || 0,
+              maxPrice: maxPrice || 0,
             }}
             validationSchema={Yup.object({
               minPrice: Yup.number().min(
